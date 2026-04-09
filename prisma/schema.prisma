@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id             String   @id @default(cuid())
+  name           String
+  format         String
+  commanderId    String?
+  minDeckSize    Int      @default(60)
+  sideboardLimit Int      @default(15)
+  entriesJson    String
+  sideboardJson  String   @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
