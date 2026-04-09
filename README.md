@@ -126,6 +126,13 @@ Deck import/export is JSON with this shape:
 - Recommendation heuristics are intentionally transparent and rule-based (no ML ranking yet).
 - Commander partners/backgrounds/special-rule exceptions are not yet modeled.
 
+
+## AI system design roadmap
+
+A detailed high-level design and 90-day execution plan for evolving this MVP into an exceptional AI deck builder is documented in:
+
+- `docs/ai-system-design.md`
+
 ## Next improvements
 
 - Add Scryfall bulk import + scheduled sync
