@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id             String   @id @default(cuid())
+  name           String
+  format         String
+  constructedFormat String @default("modern")
+  commanderId    String?
+  minDeckSize    Int      @default(60)
+  sideboardLimit Int      @default(15)
+  entriesJson    String
+  sideboardJson  String   @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  ownerId        String?
+  owner          User?    @relation(fields: [ownerId], references: [id])
+  versions       DeckVersion[]
+  cards          DeckCard[]
+  matchResults   MatchResult[]
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String?  @unique
+  displayName    String?
+  preferredStyles String  @default("[]")
+  riskTolerance  String   @default("medium")
+  budgetCapUsd   Float?
+  favoriteColors String   @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  decks          Deck[]
+  feedback       RecommendationFeedback[]
+}
+
+model DeckCard {
+  id             String   @id @default(cuid())
+  deckId         String
+  cardId         String
+  quantity       Int      @default(1)
+  zone           String   @default("main")
+  createdAt      DateTime @default(now())
+
+  deck           Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  card           CardEntity @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([deckId, zone])
+  @@index([cardId])
+}
+
+model DeckVersion {
+  id             String   @id @default(cuid())
+  deckId         String
+  versionNumber  Int
+  entriesJson    String
+  sideboardJson  String
+  note           String?
+  createdAt      DateTime @default(now())
+
+  deck           Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@unique([deckId, versionNumber])
+}
+
+model CardEntity {
+  id             String   @id
+  name           String
+  manaValue      Float
+  typeLine       String
+  oracleText     String?
+  colors         String   @default("[]")
+  colorIdentity  String   @default("[]")
+  legalitiesJson String   @default("{}")
+  imageUri       String?
+  tagsJson       String   @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  prices         CardPriceSnapshot[]
+  embeddings     CardEmbedding[]
+  deckCards      DeckCard[]
+}
+
+model CardPriceSnapshot {
+  id             String   @id @default(cuid())
+  cardId         String
+  source         String
+  usd            Float?
+  eur            Float?
+  tix            Float?
+  capturedAt     DateTime @default(now())
+
+  card           CardEntity @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  @@index([cardId, capturedAt])
+}
+
+model CardEmbedding {
+  id             String   @id @default(cuid())
+  cardId         String
+  model          String
+  vectorJson     String
+  createdAt      DateTime @default(now())
+
+  card           CardEntity @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  @@index([cardId])
+}
+
+model MetagameSnapshot {
+  id             String   @id @default(cuid())
+  format         String
+  source         String
+  generatedAt    DateTime
+  payloadJson    String
+  createdAt      DateTime @default(now())
+
+  matchups       MatchResult[]
+  @@index([format, generatedAt])
+}
+
+model MatchResult {
+  id               String   @id @default(cuid())
+  deckId           String?
+  metagameSnapshotId String?
+  archetype        String
+  opponentArchetype String?
+  wins             Int      @default(0)
+  losses           Int      @default(0)
+  draws            Int      @default(0)
+  sampleSize       Int      @default(0)
+  capturedAt       DateTime @default(now())
+
+  deck             Deck?            @relation(fields: [deckId], references: [id], onDelete: SetNull)
+  metagameSnapshot MetagameSnapshot? @relation(fields: [metagameSnapshotId], references: [id], onDelete: SetNull)
+  @@index([archetype, capturedAt])
+}
+
+model RecommendationFeedback {
+  id             String   @id @default(cuid())
+  userId         String?
+  cardId         String
+  accepted       Boolean
+  contextJson    String   @default("{}")
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@index([cardId, createdAt])
+}
