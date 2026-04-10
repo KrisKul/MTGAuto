@@ -162,16 +162,16 @@ Deterministic validator remains final safety gate before presenting/applying AI 
 - Add full-card ingest jobs + legality snapshots
 
 ### Phase 2 (Weeks 4–6): Simulation + advanced heuristics
-- Implement simulation service
-- Add objective-driven recommendation scoring
-- Add explainability and confidence outputs
+- Ship simulation service
+- Replace fixed thresholds with objective-weighted scoring
+- Add recommendation explanations and confidence
 
-### Phase 3 (Weeks 7–10): Retrieval/ranking AI
-- Build embedding + co-occurrence retrieval
-- Train first learned ranker
-- Add offline eval suite and baseline gates
+### Phase 3 (Weeks 7–10): Learning-to-rank + personalization
+- Train first ranking model from usage + outcomes
+- Add user preference profiles (tempo/control/combo, budget, format)
+- Launch A/B evaluation loop
 
-### Phase 4 (Weeks 11–13): Product polish + online eval
-- Ship context-aware copilots
-- Add matchup panel + what-if diffs + deck timeline
-- Run A/B tests and tune acceptance/revert metrics
+### Phase 4 (Weeks 11–13): Competitive polish
+- Sideboard AI
+- Matchup heatmaps
+- Deck diff insights + one-click optimize
